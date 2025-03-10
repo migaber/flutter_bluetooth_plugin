@@ -11,10 +11,12 @@ class BluetoothManager {
   static const int CONNECTED = 1;
   static const int DISCONNECTED = 0;
 
-  static const MethodChannel _channel =
-      const MethodChannel('$NAMESPACE/methods');
-  static const EventChannel _stateChannel =
-      const EventChannel('$NAMESPACE/state');
+  static const MethodChannel _channel = const MethodChannel(
+    '$NAMESPACE/methods',
+  );
+  static const EventChannel _stateChannel = const EventChannel(
+    '$NAMESPACE/state',
+  );
   Stream<MethodCall> get _methodStream => _methodStreamController.stream;
   final StreamController<MethodCall> _methodStreamController =
       StreamController.broadcast();
@@ -42,8 +44,9 @@ class BluetoothManager {
   BehaviorSubject<bool> _isScanning = BehaviorSubject.seeded(false);
   Stream<bool> get isScanning => _isScanning.stream;
 
-  BehaviorSubject<List<BluetoothDevice>> _scanResults =
-      BehaviorSubject.seeded([]);
+  BehaviorSubject<List<BluetoothDevice>> _scanResults = BehaviorSubject.seeded(
+    [],
+  );
   Stream<List<BluetoothDevice>> get scanResults => _scanResults.stream;
 
   PublishSubject _stopScanPill = new PublishSubject();
@@ -57,9 +60,7 @@ class BluetoothManager {
 
   /// Starts a scan for Bluetooth Low Energy devices
   /// Timeout closes the stream after a specified [Duration]
-  Stream<BluetoothDevice> scan({
-    Duration? timeout,
-  }) async* {
+  Stream<BluetoothDevice> scan({Duration? timeout}) async* {
     if (_isScanning.value == true) {
       throw Exception('Another scan is already in progress.');
     }
@@ -91,28 +92,28 @@ class BluetoothManager {
         .takeUntil(Rx.merge(killStreams))
         .doOnDone(stopScan)
         .map((map) {
-      final device = BluetoothDevice.fromJson(Map<String, dynamic>.from(map));
-      final List<BluetoothDevice>? list = _scanResults.value;
-      int newIndex = -1;
-      list!.asMap().forEach((index, e) {
-        if (e.address == device.address) {
-          newIndex = index;
-        }
-      });
+          final device = BluetoothDevice.fromJson(
+            Map<String, dynamic>.from(map),
+          );
+          final List<BluetoothDevice>? list = _scanResults.value;
+          int newIndex = -1;
+          list!.asMap().forEach((index, e) {
+            if (e.address == device.address) {
+              newIndex = index;
+            }
+          });
 
-      if (newIndex != -1) {
-        list[newIndex] = device;
-      } else {
-        list.add(device);
-      }
-      _scanResults.add(list);
-      return device;
-    });
+          if (newIndex != -1) {
+            list[newIndex] = device;
+          } else {
+            list.add(device);
+          }
+          _scanResults.add(list);
+          return device;
+        });
   }
 
-  Future startScan({
-    Duration? timeout,
-  }) async {
+  Future startScan({Duration? timeout}) async {
     await scan(timeout: timeout).drain();
     return _scanResults.value;
   }
@@ -124,10 +125,11 @@ class BluetoothManager {
     _isScanning.add(false);
   }
 
-  Future<dynamic> getDefault()  async {
-    await  getDefaultDevice().drain();
+  Future<dynamic> getDefault() async {
+    await getDefaultDevice().drain();
     return _scanResults.value;
   }
+
   /// => _channel.invokeMethod('getDefault');
 
   Stream<BluetoothDevice> getDefaultDevice() async* {
@@ -150,23 +152,25 @@ class BluetoothManager {
         .map((m) => m.arguments)
         .doOnDone(stopScan)
         .map((map) {
-      final device = BluetoothDevice.fromJson(Map<String, dynamic>.from(map));
-      final List<BluetoothDevice>? list = _scanResults.value;
-      int newIndex = -1;
-      list!.asMap().forEach((index, e) {
-        if (e.address == device.address) {
-          newIndex = index;
-        }
-      });
+          final device = BluetoothDevice.fromJson(
+            Map<String, dynamic>.from(map),
+          );
+          final List<BluetoothDevice>? list = _scanResults.value;
+          int newIndex = -1;
+          list!.asMap().forEach((index, e) {
+            if (e.address == device.address) {
+              newIndex = index;
+            }
+          });
 
-      if (newIndex != -1) {
-        list[newIndex] = device;
-      } else {
-        list.add(device);
-      }
-      _scanResults.add(list);
-      return device;
-    });
+          if (newIndex != -1) {
+            list[newIndex] = device;
+          } else {
+            list.add(device);
+          }
+          _scanResults.add(list);
+          return device;
+        });
   }
 
   Future<dynamic> connect(BluetoothDevice device) =>

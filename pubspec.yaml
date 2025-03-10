@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   json_annotation: ^4.1.0
+  permission_handler: ^11.4.0
   rxdart: ^0.26.0
 
 dev_dependencies:
